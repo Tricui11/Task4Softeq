@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace Task4Softeq
@@ -14,7 +13,6 @@ namespace Task4Softeq
             isWhite = _isWhite;
         }
     }
-
     class Board
     {
         public List<Field> LeftSide;
@@ -126,8 +124,10 @@ namespace Task4Softeq
             LeftSide = new List<Field>(board.LeftSide);
             RightSide = new List<Field>(board.RightSide);
         }
+        public Board()
+        {
+        }
     }
-
     class BoardNode
     {
         public Board board { get; set; }
@@ -138,26 +138,124 @@ namespace Task4Softeq
             TransformAction = _TransformAction;
         }
     }
-
     class Program
     {
         static void Main(string[] args)
         {
             #region input and define
             Console.Write("N = ");
-            int N = int.Parse(Console.ReadLine());
+            ushort N = ushort.Parse(Console.ReadLine());
             Console.Write("M = ");
-            int M = int.Parse(Console.ReadLine());
-            Board Board = new Board(N, M, true);
-            Board FinalBoard = new Board(M, N, false);
+            ushort M = ushort.Parse(Console.ReadLine());
+            Board Board = new Board();
+            Board FinalBoard = new Board();
             List<BoardNode> Road = new List<BoardNode>();
+            List<List<BoardNode>> WinnngRoutes = new List<List<BoardNode>>();
+            // get the current process
+            Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             #endregion
 
-            #region execute
+            #region CountMinTurns function f(N, M)
+            int res = 0;
+            //   We can calculate res directly, but performance is poor
+            //   res = CountMinTurns(N, M, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
+
+            // easy to notice 
+            // f(N, M) = f(M, N)                     (I)   symmetrical definition - function is even
+            // f(N+1, M) = f(N, M) + M +1            (II)  mathematical induction
+
+            res = CountMinTurns(1, 1, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
+
+            while (M > 1)
+            {
+                res += N + 1;
+                M--;
+            }
+
+            while (N > 1)
+            {
+                res += M + 1;
+                N--;
+            }
+            #endregion
+
+            #region output
+            Console.WriteLine("Answer = " + res);
+            Console.WriteLine("Memory used in MB = " + currentProcess.WorkingSet64 / 1024 / 1024);
+            Console.WriteLine("Time used in milliseconds = " + (int)currentProcess.TotalProcessorTime.TotalMilliseconds);
+            return;
+            #endregion
+        }
+
+        private static void GetTransformsRoad(Board board, Board FinalBoard, ref List<BoardNode> Road)
+        {
+            if (Board.CanTransFromLeftNearest(board) && Board.TransFormLeftNearest(board).Equals(FinalBoard))
+            {
+                Road.Add(new BoardNode(board, "CanTransFromLeftNearest"));
+                return;
+            }
+            if (Board.CanTransFromLeftThroughOne(board) && Board.TransFormLeftThroughOne(board).Equals(FinalBoard))
+            {
+                Road.Add(new BoardNode(board, "CanTransFromLeftThroughOne"));
+                return;
+            }
+            if (Board.CanTransFromRightNearest(board) && Board.TransFormRightNearest(board).Equals(FinalBoard))
+            {
+                Road.Add(new BoardNode(board, "CanTransFromRightNearest"));
+                return;
+            }
+            if (Board.CanTransFromRightThroughOne(board) && Board.TransFormRightThroughOne(board).Equals(FinalBoard))
+            {
+                Road.Add(new BoardNode(board, "CanTransFromRightThroughOne"));
+                return;
+            }
+
+            if (Board.CanTransFromLeftNearest(board))
+            {
+                Road.Add(new BoardNode(board, "TransFormLeftNearest"));
+                GetTransformsRoad(Board.TransFormLeftNearest(board), FinalBoard, ref Road);
+            }
+            if (Board.CanTransFromLeftThroughOne(board))
+            {
+                Road.Add(new BoardNode(board, "TransFormLeftThroughOne"));
+
+                GetTransformsRoad(Board.TransFormLeftThroughOne(board), FinalBoard, ref Road);
+            }
+            if (Board.CanTransFromRightNearest(board))
+            {
+                Road.Add(new BoardNode(board, "TransFormRightNearest"));
+                GetTransformsRoad(Board.TransFormRightNearest(board), FinalBoard, ref Road);
+            }
+            if (Board.CanTransFromRightThroughOne(board))
+            {
+                Road.Add(new BoardNode(board, "TransFormRightThroughOne"));
+                GetTransformsRoad(Board.TransFormRightThroughOne(board), FinalBoard, ref Road);
+            }
+        }
+        private static int CountMinTurns(ushort N, ushort M, ref Board Board, ref Board FinalBoard, ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
+        {
+            Board = new Board(N, M, true);
+            FinalBoard = new Board(M, N, false);
+            Road.Clear();
             GetTransformsRoad(Board, FinalBoard, ref Road);
             Road.Reverse();
 
-            List<List<BoardNode>> WinnngRoutes = new List<List<BoardNode>>();
+            GetWinnngRoutes(ref Road, ref WinnngRoutes);
+            ClearWinnngRoutes(ref Road, ref WinnngRoutes);
+
+            foreach (List<BoardNode> el in WinnngRoutes)
+            {
+                if (Board.Equals(el.Last().board))
+                {
+                    return(el.Count);
+                }
+            }
+
+            return 0;
+        }
+        private static void GetWinnngRoutes(ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
+        {
+            WinnngRoutes.Clear();
 
             for (int i = 0; i < Road.Count; i++)
             {
@@ -174,8 +272,9 @@ namespace Task4Softeq
                     }
                 }
             }
-
-
+        }
+        private static void ClearWinnngRoutes(ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
+        {
             for (int count = 0; count < WinnngRoutes.Count; count++)
             {
                 int i = 1;
@@ -222,7 +321,7 @@ namespace Task4Softeq
                         case "TransFormLeftNearest":
                         case "CanTransFromLeftNearest":
                             if ((!Board.CanTransFromLeftNearest(WinnngRoutes[count][i].board)) ||
-                                (!Board.TransFormLeftNearest(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i-1].board)))
+                                (!Board.TransFormLeftNearest(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i - 1].board)))
                             {
                                 WinnngRoutes[count].RemoveAt(i);
                             }
@@ -234,77 +333,6 @@ namespace Task4Softeq
                     }
                 }
                 while (i < WinnngRoutes[count].Count);
-            }
-
-
-            // сохранение первичных настроек в файл "StartupSettings.json"
-            using (StreamWriter file = File.CreateText("WinnngRoutes.json"))
-            {
-                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-                serializer.Serialize(file, WinnngRoutes);
-            }
-            #endregion
-
-            #region output
-            foreach (List<BoardNode> el in WinnngRoutes)
-            {
-                if (Board.Equals(el.Last().board))
-                {
-                    Console.WriteLine("Answer = " + el.Count);
-                    // get the current process
-                    Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-                    Console.WriteLine("Memory used in MB = " + currentProcess.WorkingSet64 / 1024 / 1024);
-                    Console.WriteLine("Time used in milliseconds = " + (int)currentProcess.TotalProcessorTime.TotalMilliseconds);
-                    Console.ReadKey();
-                    return;
-                }
-            }
-            #endregion
-        }
-
-        public static void GetTransformsRoad(Board board, Board FinalBoard, ref List<BoardNode> Road)
-        {
-            if (Board.CanTransFromLeftNearest(board) && Board.TransFormLeftNearest(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromLeftNearest"));
-                return;
-            }
-            if (Board.CanTransFromLeftThroughOne(board) && Board.TransFormLeftThroughOne(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromLeftThroughOne"));
-                return;
-            }
-            if (Board.CanTransFromRightNearest(board) && Board.TransFormRightNearest(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromRightNearest"));
-                return;
-            }
-            if (Board.CanTransFromRightThroughOne(board) && Board.TransFormRightThroughOne(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromRightThroughOne"));
-                return;
-            }
-
-            if (Board.CanTransFromLeftNearest(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormLeftNearest"));
-                GetTransformsRoad(Board.TransFormLeftNearest(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromLeftThroughOne(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormLeftThroughOne"));
-
-                GetTransformsRoad(Board.TransFormLeftThroughOne(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromRightNearest(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormRightNearest"));
-                GetTransformsRoad(Board.TransFormRightNearest(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromRightThroughOne(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormRightThroughOne"));
-                GetTransformsRoad(Board.TransFormRightThroughOne(board), FinalBoard, ref Road);
             }
         }
     }
