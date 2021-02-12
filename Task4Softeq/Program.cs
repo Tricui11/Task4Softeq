@@ -20,28 +20,6 @@ namespace Task4Softeq
         public List<Field> LeftSide;
         public int Space { get; set; }
         public List<Field> RightSide;
-
-        public Board(int N, int M, bool isWhite)
-        {
-            Space = N;
-            LeftSide = new List<Field>();
-            for (int i = 0; i < N; i++)
-            {
-                LeftSide.Add(new Field(isWhite));
-            }
-
-            RightSide = new List<Field>();
-            for (int i = 0; i < M; i++)
-            {
-                RightSide.Add(new Field(!isWhite));
-            }
-        }
-        public Board(Board board)
-        {
-            Space = board.Space;
-            LeftSide = new List<Field>(board.LeftSide);
-            RightSide = new List<Field>(board.RightSide);
-        }
         public static bool CanTransFromLeftNearest(Board Board)
         {
             return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1].isWhite && (Board.Space == Board.LeftSide.Count);
@@ -98,26 +76,6 @@ namespace Task4Softeq
 
             return Transformed;
         }
-
-/*
-        public static void Print(Board Board)
-        {
-            foreach (var el in Board.LeftSide)
-            {
-                Console.WriteLine(el.isWhite);
-            }
-
-            Console.WriteLine(Board.Space);
-
-            foreach (var el in Board.RightSide)
-            {
-                Console.WriteLine(el.isWhite);
-            }
-
-            Console.WriteLine("");
-        }
-
-*/
         public override bool Equals(object obj)
         {
             if (obj.GetType() != GetType()) return false;
@@ -147,6 +105,27 @@ namespace Task4Softeq
 
             return Space == board.Space;
         }
+        public Board(int N, int M, bool isWhite)
+        {
+            Space = N;
+            LeftSide = new List<Field>();
+            for (int i = 0; i < N; i++)
+            {
+                LeftSide.Add(new Field(isWhite));
+            }
+
+            RightSide = new List<Field>();
+            for (int i = 0; i < M; i++)
+            {
+                RightSide.Add(new Field(!isWhite));
+            }
+        }
+        public Board(Board board)
+        {
+            Space = board.Space;
+            LeftSide = new List<Field>(board.LeftSide);
+            RightSide = new List<Field>(board.RightSide);
+        }
     }
 
     class BoardNode
@@ -159,21 +138,22 @@ namespace Task4Softeq
             TransformAction = _TransformAction;
         }
     }
+
     class Program
     {
         static void Main(string[] args)
         {
+            #region input and define
             Console.Write("N = ");
             int N = int.Parse(Console.ReadLine());
             Console.Write("M = ");
             int M = int.Parse(Console.ReadLine());
             Board Board = new Board(N, M, true);
             Board FinalBoard = new Board(M, N, false);
-
             List<BoardNode> Road = new List<BoardNode>();
+            #endregion
 
-       //     Board.Print(Board);
-
+            #region execute
             GetTransformsRoad(Board, FinalBoard, ref Road);
             Road.Reverse();
 
@@ -185,22 +165,16 @@ namespace Task4Softeq
                 {
                     WinnngRoutes.Add(new List<BoardNode>());
                     int j = i;
-                    WinnngRoutes[WinnngRoutes.Count - 1].Add(Road[j]);
+                    WinnngRoutes.Last().Add(Road[j]);
                     j++;
                     while ((j < Road.Count) && (!Road[j].TransformAction.Contains("CanTransFrom")))
                     {
-                        WinnngRoutes[WinnngRoutes.Count - 1].Add(Road[j]);
+                        WinnngRoutes.Last().Add(Road[j]);
                         j++;
                     }
                 }
             }
 
-            // сохранение первичных настроек в файл "StartupSettings.json"
-            using (StreamWriter file = File.CreateText("WinnngRoutes.json"))
-            {
-                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-                serializer.Serialize(file, WinnngRoutes);
-            }
 
             for (int count = 0; count < WinnngRoutes.Count; count++)
             {
@@ -262,104 +236,74 @@ namespace Task4Softeq
                 while (i < WinnngRoutes[count].Count);
             }
 
-            List<List<BoardNode>> FilteredWinnngRoutes = new List<List<BoardNode>>();
-            foreach(List<BoardNode> el in WinnngRoutes)
+
+            // сохранение первичных настроек в файл "StartupSettings.json"
+            using (StreamWriter file = File.CreateText("WinnngRoutes.json"))
+            {
+                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                serializer.Serialize(file, WinnngRoutes);
+            }
+            #endregion
+
+            #region output
+            foreach (List<BoardNode> el in WinnngRoutes)
             {
                 if (Board.Equals(el.Last().board))
                 {
-                    FilteredWinnngRoutes.Add(el);
+                    Console.WriteLine("Answer = " + el.Count);
+                    // get the current process
+                    Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                    Console.WriteLine("Memory used in MB = " + currentProcess.WorkingSet64 / 1024 / 1024);
+                    Console.WriteLine("Time used in milliseconds = " + (int)currentProcess.TotalProcessorTime.TotalMilliseconds);
+                    Console.ReadKey();
+                    return;
                 }
             }
-
-
-            // сохранение первичных настроек в файл "StartupSettings.json"
-            using (StreamWriter file = File.CreateText("FilteredWinnngRoutes.json"))
-            {
-                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-                serializer.Serialize(file, FilteredWinnngRoutes);
-            }
-
-
-            Console.WriteLine("Answer1 = " + FilteredWinnngRoutes[0].Count);
-            Console.WriteLine("Answer2 = " + FilteredWinnngRoutes[1].Count);
-
-            // get the current process
-            Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-
-            Console.WriteLine("Memory used in MB = " + currentProcess.WorkingSet64 / 1024 / 1024);
-            Console.WriteLine("Time used in milliseconds = " + (int)currentProcess.TotalProcessorTime.TotalMilliseconds);
-
-            Console.ReadKey();
+            #endregion
         }
 
         public static void GetTransformsRoad(Board board, Board FinalBoard, ref List<BoardNode> Road)
         {
             if (Board.CanTransFromLeftNearest(board) && Board.TransFormLeftNearest(board).Equals(FinalBoard))
             {
-       //         Console.WriteLine("CanTransFromLeftNearest ");
-         //       Board.Print(board);
-
                 Road.Add(new BoardNode(board, "CanTransFromLeftNearest"));
                 return;
             }
             if (Board.CanTransFromLeftThroughOne(board) && Board.TransFormLeftThroughOne(board).Equals(FinalBoard))
             {
-     //           Console.WriteLine("CanTransFromLeftThroughOne ");
-      //          Board.Print(board);
-
                 Road.Add(new BoardNode(board, "CanTransFromLeftThroughOne"));
                 return;
             }
             if (Board.CanTransFromRightNearest(board) && Board.TransFormRightNearest(board).Equals(FinalBoard))
             {
-     //           Console.WriteLine("CanTransFromRightNearest ");
-       //         Board.Print(board);
-
                 Road.Add(new BoardNode(board, "CanTransFromRightNearest"));
                 return;
             }
             if (Board.CanTransFromRightThroughOne(board) && Board.TransFormRightThroughOne(board).Equals(FinalBoard))
             {
-     //           Console.WriteLine("CanTransFromRightThroughOne ");
-         //       Board.Print(board);
-
                 Road.Add(new BoardNode(board, "CanTransFromRightThroughOne"));
                 return;
             }
 
             if (Board.CanTransFromLeftNearest(board))
             {
-     //           Console.WriteLine("TransFormLeftNearest ");
-         //       Board.Print(board);
-
                 Road.Add(new BoardNode(board, "TransFormLeftNearest"));
                 GetTransformsRoad(Board.TransFormLeftNearest(board), FinalBoard, ref Road);
             }
             if (Board.CanTransFromLeftThroughOne(board))
             {
-      //          Console.WriteLine("TransFormLeftThroughOne ");
-         //       Board.Print(board);
-
                 Road.Add(new BoardNode(board, "TransFormLeftThroughOne"));
 
                 GetTransformsRoad(Board.TransFormLeftThroughOne(board), FinalBoard, ref Road);
             }
             if (Board.CanTransFromRightNearest(board))
             {
-    //            Console.WriteLine("TransFormRightNearest ");
-   //             Board.Print(board);
-
                 Road.Add(new BoardNode(board, "TransFormRightNearest"));
-
                 GetTransformsRoad(Board.TransFormRightNearest(board), FinalBoard, ref Road);
             }
             if (Board.CanTransFromRightThroughOne(board))
             {
-      //          Console.WriteLine("TransFormRightThroughOne ");
-     //           Board.Print(board);
-
                 Road.Add(new BoardNode(board, "TransFormRightThroughOne"));
-
                 GetTransformsRoad(Board.TransFormRightThroughOne(board), FinalBoard, ref Road);
             }
         }
