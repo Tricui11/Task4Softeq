@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Task4Softeq
@@ -143,16 +142,41 @@ namespace Task4Softeq
         static void Main(string[] args)
         {
             #region input and define
-            Console.Write("N = ");
-            ushort N = ushort.Parse(Console.ReadLine());
-            Console.Write("M = ");
-            ushort M = ushort.Parse(Console.ReadLine());
+            if (args.Length != 2)
+            {
+                Console.WriteLine("Please enter correct N and M");
+                return;
+            }
+
+            ushort byteValue;
+            bool success;
+            foreach (var el in args)
+            {
+                success = ushort.TryParse(el, out byteValue);
+                if (!success)
+                {
+                    Console.WriteLine("N and M must be natural numbers");
+                    return;
+                }
+            }
+
+            ushort N = ushort.Parse(args[0]);
+            if ((N < 1) || (N > 1000))
+            {
+                Console.WriteLine("N must be in range [1, 1000]");
+                return;
+            }
+            ushort M = ushort.Parse(args[1]);
+            if ((M < 1) || (M > 1000))
+            {
+                Console.WriteLine("NM must be in range [1, 1000]");
+                return;
+            }
+
             Board Board = new Board();
             Board FinalBoard = new Board();
             List<BoardNode> Road = new List<BoardNode>();
             List<List<BoardNode>> WinnngRoutes = new List<List<BoardNode>>();
-            // get the current process
-            Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             #endregion
 
             #region CountMinTurns function f(N, M)
@@ -161,8 +185,8 @@ namespace Task4Softeq
             //   res = CountMinTurns(N, M, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
 
             // easy to notice 
-            // f(N, M) = f(M, N)                     (I)   symmetrical definition - function is even
-            // f(N+1, M) = f(N, M) + M +1            (II)  mathematical induction
+            // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
+            // f(N + 1, M) = f(N, M) + M + 1            (II)  mathematical induction
 
             res = CountMinTurns(1, 1, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
 
@@ -179,12 +203,8 @@ namespace Task4Softeq
             }
             #endregion
 
-            #region output
-            Console.WriteLine("Answer = " + res);
-            Console.WriteLine("Memory used in MB = " + currentProcess.WorkingSet64 / 1024 / 1024);
-            Console.WriteLine("Time used in milliseconds = " + (int)currentProcess.TotalProcessorTime.TotalMilliseconds);
+            Console.WriteLine(res);
             return;
-            #endregion
         }
 
         private static void GetTransformsRoad(Board board, Board FinalBoard, ref List<BoardNode> Road)

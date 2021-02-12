@@ -57,11 +57,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4\\Task4Softeq\\Task4Softeq.csproj",
+      "projectUniqueName": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
       "projectName": "Task4Softeq",
-      "projectPath": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4\\Task4Softeq\\Task4Softeq.csproj",
+      "projectPath": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
       "packagesPath": "C:\\Users\\Furer\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4\\Task4Softeq\\obj\\",
+      "outputPath": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4Softeq\\Task4Softeq\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Furer\\AppData\\Roaming\\NuGet\\NuGet.Config",
