@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kx5wmMNDA/WMO9C2Bt+kj5ws7p2LkKrXMQ5rAsYaFGPqO06PMc3fqVLK5KVK7xGHTfruHI0P9jOpuR7WTit/5w==",
+  "dgSpecHash": "KDkWR1iORz3CGKJQMItPKOnJe3Ssa7t8SN5c7DywuddkgSzZb9vwGmpq3LDpSD9pCf75/kMM16JKd++U6D93gA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Furer\\Desktop\\Softeq\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
+  "projectFilePath": "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Furer\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
   ],

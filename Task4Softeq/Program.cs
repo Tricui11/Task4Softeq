@@ -2,358 +2,319 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Task4Softeq
-{
-    class Field
-    {
-        public bool isWhite { get; set; }
-        public Field(bool _isWhite)
-        {
-            isWhite = _isWhite;
-        }
+namespace Task4Softeq {
+  class Field {
+    public bool IsWhite { get; set; }
+    public Field(bool isWhite) {
+      IsWhite = isWhite;
     }
-    class Board
-    {
-        public List<Field> LeftSide;
-        public int Space { get; set; }
-        public List<Field> RightSide;
-        public static bool CanTransFromLeftNearest(Board Board)
-        {
-            return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1].isWhite && (Board.Space == Board.LeftSide.Count);
-        }
-        public static Board TransFormLeftNearest(Board Board)
-        {
-            Board Transformed = new Board(Board);
-            Transformed.Space--;
-            Transformed.RightSide.Insert(0, Transformed.LeftSide[Transformed.LeftSide.Count - 1]);
-            Transformed.LeftSide.RemoveAt(Transformed.LeftSide.Count - 1);
-
-            return Transformed;
-        }
-        public static bool CanTransFromLeftThroughOne(Board Board)
-        {
-            return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2].isWhite && (Board.Space == Board.LeftSide.Count);
-        }
-        public static Board TransFormLeftThroughOne(Board Board)
-        {
-            Board Transformed = new Board(Board);
-            Transformed.Space -= 2;
-            Transformed.RightSide.Insert(0, Transformed.LeftSide[Transformed.LeftSide.Count - 2]);
-            Transformed.RightSide.Insert(0, Transformed.LeftSide[Transformed.LeftSide.Count - 1]);
-            Transformed.LeftSide.RemoveAt(Transformed.LeftSide.Count - 1);
-            Transformed.LeftSide.RemoveAt(Transformed.LeftSide.Count - 1);
-
-            return Transformed;
-        }
-        public static bool CanTransFromRightNearest(Board Board)
-        {
-            return (Board.RightSide.Count > 0) && !Board.RightSide[0].isWhite && (Board.Space == Board.LeftSide.Count);
-        }
-        public static Board TransFormRightNearest(Board Board)
-        {
-            Board Transformed = new Board(Board);
-            Transformed.Space++;
-            Transformed.LeftSide.Add(Transformed.RightSide[0]);
-            Transformed.RightSide.RemoveAt(0);
-
-            return Transformed;
-        }
-        public static bool CanTransFromRightThroughOne(Board Board)
-        {
-            return (Board.RightSide.Count > 1) && !Board.RightSide[1].isWhite && (Board.Space == Board.LeftSide.Count);
-        }
-        public static Board TransFormRightThroughOne(Board Board)
-        {
-            Board Transformed = new Board(Board);
-            Transformed.Space += 2;
-            Transformed.LeftSide.Add(Transformed.RightSide[1]);
-            Transformed.LeftSide.Add(Transformed.RightSide[0]);
-            Transformed.RightSide.RemoveAt(0);
-            Transformed.RightSide.RemoveAt(0);
-
-            return Transformed;
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() != GetType()) return false;
-
-            Board board = (Board)obj;
-
-            if ((LeftSide.Count != board.LeftSide.Count) || (RightSide.Count != board.RightSide.Count))
-            {
-                return false;
-            }
-
-            for (int i = 0; i < LeftSide.Count; i++)
-            {
-                if (LeftSide[i].isWhite != board.LeftSide[i].isWhite)
-                {
-                    return false;
-                }
-            }
-
-            for (int i = 0; i < RightSide.Count; i++)
-            {
-                if (RightSide[i].isWhite != board.RightSide[i].isWhite)
-                {
-                    return false;
-                }
-            }
-
-            return Space == board.Space;
-        }
-        public Board(int N, int M, bool isWhite)
-        {
-            Space = N;
-            LeftSide = new List<Field>();
-            for (int i = 0; i < N; i++)
-            {
-                LeftSide.Add(new Field(isWhite));
-            }
-
-            RightSide = new List<Field>();
-            for (int i = 0; i < M; i++)
-            {
-                RightSide.Add(new Field(!isWhite));
-            }
-        }
-        public Board(Board board)
-        {
-            Space = board.Space;
-            LeftSide = new List<Field>(board.LeftSide);
-            RightSide = new List<Field>(board.RightSide);
-        }
-        public Board()
-        {
-        }
+  }
+  class Board {
+    public List<Field> LeftSide;
+    public int Space { get; set; }
+    public List<Field> RightSide;
+    public static bool CanTransFromLeftNearest(Board Board) {
+      return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1].IsWhite && (Board.Space == Board.LeftSide.Count);
     }
-    class BoardNode
-    {
-        public Board board { get; set; }
-        public string TransformAction { get; set; }
-        public BoardNode(Board _board, string _TransformAction)
-        {
-            board = _board;
-            TransformAction = _TransformAction;
-        }
+    public static Board TransFormLeftNearest(Board Board) {
+      Board transformed = new(Board);
+      transformed.Space--;
+      transformed.RightSide.Insert(0, transformed.LeftSide[transformed.LeftSide.Count - 1]);
+      transformed.LeftSide.RemoveAt(transformed.LeftSide.Count - 1);
+
+      return transformed;
     }
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            #region input and define
-            if (args.Length != 2)
-            {
-                Console.WriteLine("Please enter correct N and M");
-                return;
-            }
-
-            ushort byteValue;
-            bool success;
-            foreach (var el in args)
-            {
-                success = ushort.TryParse(el, out byteValue);
-                if (!success)
-                {
-                    Console.WriteLine("N and M must be natural numbers");
-                    return;
-                }
-            }
-
-            ushort N = ushort.Parse(args[0]);
-            if ((N < 1) || (N > 1000))
-            {
-                Console.WriteLine("N must be in range [1, 1000]");
-                return;
-            }
-            ushort M = ushort.Parse(args[1]);
-            if ((M < 1) || (M > 1000))
-            {
-                Console.WriteLine("NM must be in range [1, 1000]");
-                return;
-            }
-
-            Board Board = new Board();
-            Board FinalBoard = new Board();
-            List<BoardNode> Road = new List<BoardNode>();
-            List<List<BoardNode>> WinnngRoutes = new List<List<BoardNode>>();
-            #endregion
-
-            #region CountMinTurns function f(N, M)
-            int res = 0;
-            //   We can calculate res directly, but performance is poor
-            //   res = CountMinTurns(N, M, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
-
-            // easy to notice 
-            // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
-            // f(N + 1, M) = f(N, M) + M + 1            (II)  mathematical induction
-
-            res = CountMinTurns(1, 1, ref Board, ref FinalBoard, ref Road, ref WinnngRoutes);
-
-            while (M > 1)
-            {
-                res += N + 1;
-                M--;
-            }
-
-            while (N > 1)
-            {
-                res += M + 1;
-                N--;
-            }
-            #endregion
-
-            Console.WriteLine(res);
-            return;
-        }
-
-        private static void GetTransformsRoad(Board board, Board FinalBoard, ref List<BoardNode> Road)
-        {
-            if (Board.CanTransFromLeftNearest(board) && Board.TransFormLeftNearest(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromLeftNearest"));
-                return;
-            }
-            if (Board.CanTransFromLeftThroughOne(board) && Board.TransFormLeftThroughOne(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromLeftThroughOne"));
-                return;
-            }
-            if (Board.CanTransFromRightNearest(board) && Board.TransFormRightNearest(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromRightNearest"));
-                return;
-            }
-            if (Board.CanTransFromRightThroughOne(board) && Board.TransFormRightThroughOne(board).Equals(FinalBoard))
-            {
-                Road.Add(new BoardNode(board, "CanTransFromRightThroughOne"));
-                return;
-            }
-
-            if (Board.CanTransFromLeftNearest(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormLeftNearest"));
-                GetTransformsRoad(Board.TransFormLeftNearest(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromLeftThroughOne(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormLeftThroughOne"));
-
-                GetTransformsRoad(Board.TransFormLeftThroughOne(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromRightNearest(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormRightNearest"));
-                GetTransformsRoad(Board.TransFormRightNearest(board), FinalBoard, ref Road);
-            }
-            if (Board.CanTransFromRightThroughOne(board))
-            {
-                Road.Add(new BoardNode(board, "TransFormRightThroughOne"));
-                GetTransformsRoad(Board.TransFormRightThroughOne(board), FinalBoard, ref Road);
-            }
-        }
-        private static int CountMinTurns(ushort N, ushort M, ref Board Board, ref Board FinalBoard, ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
-        {
-            Board = new Board(N, M, true);
-            FinalBoard = new Board(M, N, false);
-            Road.Clear();
-            GetTransformsRoad(Board, FinalBoard, ref Road);
-            Road.Reverse();
-
-            GetWinnngRoutes(ref Road, ref WinnngRoutes);
-            ClearWinnngRoutes(ref Road, ref WinnngRoutes);
-
-            foreach (List<BoardNode> el in WinnngRoutes)
-            {
-                if (Board.Equals(el.Last().board))
-                {
-                    return(el.Count);
-                }
-            }
-
-            return 0;
-        }
-        private static void GetWinnngRoutes(ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
-        {
-            WinnngRoutes.Clear();
-
-            for (int i = 0; i < Road.Count; i++)
-            {
-                if (Road[i].TransformAction.Contains("CanTransFrom"))
-                {
-                    WinnngRoutes.Add(new List<BoardNode>());
-                    int j = i;
-                    WinnngRoutes.Last().Add(Road[j]);
-                    j++;
-                    while ((j < Road.Count) && (!Road[j].TransformAction.Contains("CanTransFrom")))
-                    {
-                        WinnngRoutes.Last().Add(Road[j]);
-                        j++;
-                    }
-                }
-            }
-        }
-        private static void ClearWinnngRoutes(ref List<BoardNode> Road, ref List<List<BoardNode>> WinnngRoutes)
-        {
-            for (int count = 0; count < WinnngRoutes.Count; count++)
-            {
-                int i = 1;
-                do
-                {
-                    switch (WinnngRoutes[count][i].TransformAction)
-                    {
-                        case "TransFormRightThroughOne":
-                        case "CanTransFromRightThroughOne":
-                            if ((!Board.CanTransFromRightThroughOne(WinnngRoutes[count][i].board)) ||
-                                (!Board.TransFormRightThroughOne(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i - 1].board)))
-                            {
-                                WinnngRoutes[count].RemoveAt(i);
-                            }
-                            else
-                            {
-                                i++;
-                            }
-                            break;
-                        case "TransFormRightNearest":
-                        case "CanTransFromRightNearest":
-                            if ((!Board.CanTransFromRightNearest(WinnngRoutes[count][i].board)) ||
-                                (!Board.TransFormRightNearest(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i - 1].board)))
-                            {
-                                WinnngRoutes[count].RemoveAt(i);
-                            }
-                            else
-                            {
-                                i++;
-                            }
-                            break;
-                        case "TransFormLeftThroughOne":
-                        case "CanTransFromLeftThroughOne":
-                            if ((!Board.CanTransFromLeftThroughOne(WinnngRoutes[count][i].board)) ||
-                                (!Board.TransFormLeftThroughOne(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i - 1].board)))
-                            {
-                                WinnngRoutes[count].RemoveAt(i);
-                            }
-                            else
-                            {
-                                i++;
-                            }
-                            break;
-                        case "TransFormLeftNearest":
-                        case "CanTransFromLeftNearest":
-                            if ((!Board.CanTransFromLeftNearest(WinnngRoutes[count][i].board)) ||
-                                (!Board.TransFormLeftNearest(WinnngRoutes[count][i].board).Equals(WinnngRoutes[count][i - 1].board)))
-                            {
-                                WinnngRoutes[count].RemoveAt(i);
-                            }
-                            else
-                            {
-                                i++;
-                            }
-                            break;
-                    }
-                }
-                while (i < WinnngRoutes[count].Count);
-            }
-        }
+    public static bool CanTransFromLeftThroughOne(Board Board) {
+      return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2].IsWhite && (Board.Space == Board.LeftSide.Count);
     }
+    public static Board TransFormLeftThroughOne(Board Board) {
+      Board transformed = new(Board);
+      transformed.Space -= 2;
+      transformed.RightSide.Insert(0, transformed.LeftSide[transformed.LeftSide.Count - 2]);
+      transformed.RightSide.Insert(0, transformed.LeftSide[transformed.LeftSide.Count - 1]);
+      transformed.LeftSide.RemoveAt(transformed.LeftSide.Count - 1);
+      transformed.LeftSide.RemoveAt(transformed.LeftSide.Count - 1);
+
+      return transformed;
+    }
+    public static bool CanTransFromRightNearest(Board Board) {
+      return (Board.RightSide.Count > 0) && !Board.RightSide[0].IsWhite && (Board.Space == Board.LeftSide.Count);
+    }
+    public static Board TransFormRightNearest(Board Board) {
+      Board transformed = new(Board);
+      transformed.Space++;
+      transformed.LeftSide.Add(transformed.RightSide[0]);
+      transformed.RightSide.RemoveAt(0);
+
+      return transformed;
+    }
+    public static bool CanTransFromRightThroughOne(Board Board) {
+      return (Board.RightSide.Count > 1) && !Board.RightSide[1].IsWhite && (Board.Space == Board.LeftSide.Count);
+    }
+    public static Board TransFormRightThroughOne(Board Board) {
+      Board transformed = new(Board);
+      transformed.Space += 2;
+      transformed.LeftSide.Add(transformed.RightSide[1]);
+      transformed.LeftSide.Add(transformed.RightSide[0]);
+      transformed.RightSide.RemoveAt(0);
+      transformed.RightSide.RemoveAt(0);
+
+      return transformed;
+    }
+    public override bool Equals(object obj) {
+      if (obj.GetType() != GetType()) return false;
+
+      Board board = (Board)obj;
+
+      if ((LeftSide.Count != board.LeftSide.Count) || (RightSide.Count != board.RightSide.Count)) {
+        return false;
+      }
+
+      for (int i = 0; i < LeftSide.Count; i++) {
+        if (LeftSide[i].IsWhite != board.LeftSide[i].IsWhite) {
+          return false;
+        }
+      }
+
+      for (int i = 0; i < RightSide.Count; i++) {
+        if (RightSide[i].IsWhite != board.RightSide[i].IsWhite) {
+          return false;
+        }
+      }
+
+      return Space == board.Space;
+    }
+    public Board(int N, int M, bool isWhite) {
+      Space = N;
+      LeftSide = new List<Field>();
+      for (int i = 0; i < N; i++) {
+        LeftSide.Add(new Field(isWhite));
+      }
+
+      RightSide = new List<Field>();
+      for (int i = 0; i < M; i++) {
+        RightSide.Add(new Field(!isWhite));
+      }
+    }
+    public Board(Board board) {
+      Space = board.Space;
+      LeftSide = new List<Field>(board.LeftSide);
+      RightSide = new List<Field>(board.RightSide);
+    }
+    public Board() {
+    }
+  }
+  class BoardNode {
+    public Board Board { get; set; }
+    public TransFormAction TransformAction { get; set; }
+    public BoardNode(Board board, TransFormAction transformAction) {
+      Board = board;
+      TransformAction = transformAction;
+    }
+
+    public bool CanTransform() => TransformAction == TransFormAction.CanTransFromRightNearest ||
+    TransformAction == TransFormAction.CanTransFromLeftNearest ||
+    TransformAction == TransFormAction.CanTransFromLeftThroughOne ||
+    TransformAction == TransFormAction.CanTransFromRightThroughOne;
+  }
+  class Program {
+    static void Main(string[] args) {
+      #region input and define
+      if (args.Length != 2) {
+        Console.WriteLine("Please enter correct N and M");
+        return;
+      }
+
+      ushort byteValue;
+      bool success;
+      foreach (var el in args) {
+        success = ushort.TryParse(el, out byteValue);
+        if (!success) {
+          Console.WriteLine("N and M must be natural numbers");
+          return;
+        }
+      }
+
+      ushort N = ushort.Parse(args[0]);
+      if ((N < 1) || (N > 1000)) {
+        Console.WriteLine("N must be in range [1, 1000]");
+        return;
+      }
+      ushort M = ushort.Parse(args[1]);
+      if ((M < 1) || (M > 1000)) {
+        Console.WriteLine("NM must be in range [1, 1000]");
+        return;
+      }
+
+      Board board = new();
+      Board finalBoard = new();
+      List<BoardNode> road = new();
+      List<List<BoardNode>> winnngRoutes = new();
+      #endregion
+
+      #region CountMinTurns function f(N, M)
+      int res = 0;
+      //   We can calculate res directly, but performance is poor
+      res = CountMinTurns(N, M, ref board, ref finalBoard, ref road, ref winnngRoutes);
+
+      // easy to notice 
+      // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
+      // f(N + 1, M) = f(N, M) + M + 1            (II)  mathematical induction
+
+      //res = CountMinTurns(1, 1, ref board, ref finalBoard, ref road, ref winnngRoutes);
+
+      //while (M > 1) {
+      //  res += N + 1;
+      //  M--;
+      //}
+
+      //while (N > 1) {
+      //  res += M + 1;
+      //  N--;
+      //}
+      #endregion
+
+      Console.WriteLine(res);
+      return;
+    }
+
+    private static void GetTransformsRoad(Board board, Board finalBoard, ref List<BoardNode> road) {
+
+
+
+
+
+      foreach(var el in board.LeftSide) {
+        Console.Write(el.IsWhite.ToString() + ' ');
+      }
+      Console.Write(board.Space.ToString() + ' ');
+      foreach (var el in board.RightSide) {
+        Console.Write(el.IsWhite.ToString() + ' ');
+      }
+      Console.WriteLine();
+
+
+
+
+
+
+
+
+      if (Board.CanTransFromLeftNearest(board) && Board.TransFormLeftNearest(board).Equals(finalBoard)) {
+        road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftNearest));
+        return;
+      }
+      if (Board.CanTransFromLeftThroughOne(board) && Board.TransFormLeftThroughOne(board).Equals(finalBoard)) {
+        road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftThroughOne));
+        return;
+      }
+      if (Board.CanTransFromRightNearest(board) && Board.TransFormRightNearest(board).Equals(finalBoard)) {
+        road.Add(new BoardNode(board, TransFormAction.CanTransFromRightNearest));
+        return;
+      }
+      if (Board.CanTransFromRightThroughOne(board) && Board.TransFormRightThroughOne(board).Equals(finalBoard)) {
+        road.Add(new BoardNode(board, TransFormAction.CanTransFromRightThroughOne));
+        return;
+      }
+
+      if (Board.CanTransFromLeftNearest(board)) {
+        road.Add(new BoardNode(board, TransFormAction.TransFormLeftNearest));
+        GetTransformsRoad(Board.TransFormLeftNearest(board), finalBoard, ref road);
+      }
+      if (Board.CanTransFromLeftThroughOne(board)) {
+        road.Add(new BoardNode(board, TransFormAction.TransFormLeftThroughOne));
+
+        GetTransformsRoad(Board.TransFormLeftThroughOne(board), finalBoard, ref road);
+      }
+      if (Board.CanTransFromRightNearest(board)) {
+        road.Add(new BoardNode(board, TransFormAction.TransFormRightNearest));
+        GetTransformsRoad(Board.TransFormRightNearest(board), finalBoard, ref road);
+      }
+      if (Board.CanTransFromRightThroughOne(board)) {
+        road.Add(new BoardNode(board, TransFormAction.TransFormRightThroughOne));
+        GetTransformsRoad(Board.TransFormRightThroughOne(board), finalBoard, ref road);
+      }
+    }
+    private static int CountMinTurns(ushort N, ushort M, ref Board board, ref Board finalBoard,
+      ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes) {
+      board = new Board(N, M, true);
+      finalBoard = new Board(M, N, false);
+      road.Clear();
+      GetTransformsRoad(board, finalBoard, ref road);
+      road.Reverse();
+
+      GetWinnngRoutes(ref road, ref winnngRoutes);
+      ClearWinnngRoutes(ref road, ref winnngRoutes);
+
+      foreach (List<BoardNode> el in winnngRoutes) {
+        if (board.Equals(el.Last().Board)) {
+          return el.Count;
+        }
+      }
+
+      return 0;
+    }
+    private static void GetWinnngRoutes(ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes) {
+      winnngRoutes.Clear();
+
+      for (int i = 0; i < road.Count; i++) {
+        if (road[i].CanTransform()) {
+          winnngRoutes.Add(new List<BoardNode>());
+          int j = i;
+          winnngRoutes.Last().Add(road[j]);
+          j++;
+          while ((j < road.Count) && (!road[j].CanTransform())) {
+            winnngRoutes.Last().Add(road[j]);
+            j++;
+          }
+        }
+      }
+    }
+    private static void ClearWinnngRoutes(ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes) {
+      for (int count = 0; count < winnngRoutes.Count; count++) {
+        int i = 1;
+        do {
+          switch (winnngRoutes[count][i].TransformAction) {
+            case TransFormAction.TransFormRightThroughOne:
+            case TransFormAction.CanTransFromRightThroughOne:
+              if ((!Board.CanTransFromRightThroughOne(winnngRoutes[count][i].Board)) ||
+                  (!Board.TransFormRightThroughOne(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board))) {
+                winnngRoutes[count].RemoveAt(i);
+              } else {
+                i++;
+              }
+              break;
+            case TransFormAction.TransFormRightNearest:
+            case TransFormAction.CanTransFromRightNearest:
+              if ((!Board.CanTransFromRightNearest(winnngRoutes[count][i].Board)) ||
+                  (!Board.TransFormRightNearest(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board))) {
+                winnngRoutes[count].RemoveAt(i);
+              } else {
+                i++;
+              }
+              break;
+            case TransFormAction.TransFormLeftThroughOne:
+            case TransFormAction.CanTransFromLeftThroughOne:
+              if ((!Board.CanTransFromLeftThroughOne(winnngRoutes[count][i].Board)) ||
+                  (!Board.TransFormLeftThroughOne(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board))) {
+                winnngRoutes[count].RemoveAt(i);
+              } else {
+                i++;
+              }
+              break;
+            case TransFormAction.TransFormLeftNearest:
+            case TransFormAction.CanTransFromLeftNearest:
+              if ((!Board.CanTransFromLeftNearest(winnngRoutes[count][i].Board)) ||
+                  (!Board.TransFormLeftNearest(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board))) {
+                winnngRoutes[count].RemoveAt(i);
+              } else {
+                i++;
+              }
+              break;
+          }
+        }
+        while (i < winnngRoutes[count].Count);
+      }
+    }
+  }
 }
