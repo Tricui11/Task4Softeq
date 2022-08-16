@@ -8,7 +8,7 @@ namespace Task4Softeq {
     public int Space { get; set; }
     public List<bool> RightSide;
     public static bool CanTransFromLeftNearest(Board Board) {
-      return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1] && (Board.Space == Board.LeftSide.Count);
+      return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1];
     }
     public static Board TransFormLeftNearest(Board Board) {
       Board transformed = new(Board);
@@ -19,7 +19,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromLeftThroughOne(Board Board) {
-      return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2] && (Board.Space == Board.LeftSide.Count);
+      return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2];
     }
     public static Board TransFormLeftThroughOne(Board Board) {
       Board transformed = new(Board);
@@ -32,7 +32,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromRightNearest(Board Board) {
-      return (Board.RightSide.Count > 0) && !Board.RightSide[0] && (Board.Space == Board.LeftSide.Count);
+      return (Board.RightSide.Count > 0) && !Board.RightSide[0];
     }
     public static Board TransFormRightNearest(Board Board) {
       Board transformed = new(Board);
@@ -43,7 +43,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromRightThroughOne(Board Board) {
-      return (Board.RightSide.Count > 1) && !Board.RightSide[1] && (Board.Space == Board.LeftSide.Count);
+      return (Board.RightSide.Count > 1) && !Board.RightSide[1];
     }
     public static Board TransFormRightThroughOne(Board Board) {
       Board transformed = new(Board);
