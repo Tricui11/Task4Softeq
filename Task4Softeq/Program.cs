@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Task4Softeq {
-  class Field {
-    public bool IsWhite { get; set; }
-    public Field(bool isWhite) {
-      IsWhite = isWhite;
-    }
-  }
   class Board {
-    public List<Field> LeftSide;
+    public List<bool> LeftSide;
     public int Space { get; set; }
-    public List<Field> RightSide;
+    public List<bool> RightSide;
     public static bool CanTransFromLeftNearest(Board Board) {
-      return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1].IsWhite && (Board.Space == Board.LeftSide.Count);
+      return (Board.LeftSide.Count > 0) && Board.LeftSide[Board.LeftSide.Count - 1] && (Board.Space == Board.LeftSide.Count);
     }
     public static Board TransFormLeftNearest(Board Board) {
       Board transformed = new(Board);
@@ -25,7 +19,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromLeftThroughOne(Board Board) {
-      return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2].IsWhite && (Board.Space == Board.LeftSide.Count);
+      return (Board.LeftSide.Count > 1) && Board.LeftSide[Board.LeftSide.Count - 2] && (Board.Space == Board.LeftSide.Count);
     }
     public static Board TransFormLeftThroughOne(Board Board) {
       Board transformed = new(Board);
@@ -38,7 +32,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromRightNearest(Board Board) {
-      return (Board.RightSide.Count > 0) && !Board.RightSide[0].IsWhite && (Board.Space == Board.LeftSide.Count);
+      return (Board.RightSide.Count > 0) && !Board.RightSide[0] && (Board.Space == Board.LeftSide.Count);
     }
     public static Board TransFormRightNearest(Board Board) {
       Board transformed = new(Board);
@@ -49,7 +43,7 @@ namespace Task4Softeq {
       return transformed;
     }
     public static bool CanTransFromRightThroughOne(Board Board) {
-      return (Board.RightSide.Count > 1) && !Board.RightSide[1].IsWhite && (Board.Space == Board.LeftSide.Count);
+      return (Board.RightSide.Count > 1) && !Board.RightSide[1] && (Board.Space == Board.LeftSide.Count);
     }
     public static Board TransFormRightThroughOne(Board Board) {
       Board transformed = new(Board);
@@ -71,13 +65,13 @@ namespace Task4Softeq {
       }
 
       for (int i = 0; i < LeftSide.Count; i++) {
-        if (LeftSide[i].IsWhite != board.LeftSide[i].IsWhite) {
+        if (LeftSide[i] != board.LeftSide[i]) {
           return false;
         }
       }
 
       for (int i = 0; i < RightSide.Count; i++) {
-        if (RightSide[i].IsWhite != board.RightSide[i].IsWhite) {
+        if (RightSide[i] != board.RightSide[i]) {
           return false;
         }
       }
@@ -86,20 +80,20 @@ namespace Task4Softeq {
     }
     public Board(int N, int M, bool isWhite) {
       Space = N;
-      LeftSide = new List<Field>();
+      LeftSide = new List<bool>();
       for (int i = 0; i < N; i++) {
-        LeftSide.Add(new Field(isWhite));
+        LeftSide.Add(isWhite);
       }
 
-      RightSide = new List<Field>();
+      RightSide = new List<bool>();
       for (int i = 0; i < M; i++) {
-        RightSide.Add(new Field(!isWhite));
+        RightSide.Add(!isWhite);
       }
     }
     public Board(Board board) {
       Space = board.Space;
-      LeftSide = new List<Field>(board.LeftSide);
-      RightSide = new List<Field>(board.RightSide);
+      LeftSide = new List<bool>(board.LeftSide);
+      RightSide = new List<bool>(board.RightSide);
     }
     public Board() {
     }
@@ -120,31 +114,9 @@ namespace Task4Softeq {
   class Program {
     static void Main(string[] args) {
       #region input and define
-      if (args.Length != 2) {
-        Console.WriteLine("Please enter correct N and M");
-        return;
-      }
 
-      ushort byteValue;
-      bool success;
-      foreach (var el in args) {
-        success = ushort.TryParse(el, out byteValue);
-        if (!success) {
-          Console.WriteLine("N and M must be natural numbers");
-          return;
-        }
-      }
-
-      ushort N = ushort.Parse(args[0]);
-      if ((N < 1) || (N > 1000)) {
-        Console.WriteLine("N must be in range [1, 1000]");
-        return;
-      }
-      ushort M = ushort.Parse(args[1]);
-      if ((M < 1) || (M > 1000)) {
-        Console.WriteLine("NM must be in range [1, 1000]");
-        return;
-      }
+      ushort N = 5;
+      ushort M = 6;
 
       Board board = new();
       Board finalBoard = new();
@@ -183,16 +155,14 @@ namespace Task4Softeq {
 
 
 
-
       foreach(var el in board.LeftSide) {
-        Console.Write(el.IsWhite.ToString() + ' ');
+        Console.Write(el.ToString() + ' ');
       }
       Console.Write(board.Space.ToString() + ' ');
       foreach (var el in board.RightSide) {
-        Console.Write(el.IsWhite.ToString() + ' ');
+        Console.Write(el.ToString() + ' ');
       }
       Console.WriteLine();
-
 
 
 
