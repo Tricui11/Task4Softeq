@@ -4,8 +4,8 @@ namespace Task4Softeq
 {
     internal class Board
     {
-        private readonly bool[] fields;
-        private int space;
+        internal readonly bool[] fields;
+        internal int space;
 
         internal Board(int N, int M, bool isWhite)
         {

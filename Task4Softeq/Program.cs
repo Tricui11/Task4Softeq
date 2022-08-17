@@ -24,18 +24,30 @@ namespace Task4Softeq
         {
             #region input and define
 
-            ushort N = 8;
-            ushort M = 10;
+            ushort N = 1;
+            ushort M = 1;
 
-            Board board = new(N, M, true);
-            Board finalBoard = new(M, N, false);
             List<BoardNode> road = new();
+
+            Board initialBoard = new(N, M, true);
+            //изначально всегда можно сделать четыре ход двумя ближайшими к пробелу или же через одну черными или белыми 
+            //легко показать что первый ход через одну всегда проигрышный, так как после него можно ходить только фигурами этого же цвета,
+            //а фигуры противоположенного становятся недоступны после чего пробел всегда смещается в край и мы
+            //получаем доски вида WWWWBBBBBX или XWWWWWBBBBB
+
+            //т.е. первый ход всегда будет ближайшей черной или белой
+            //также задача определенна симетрична, поэтому не теряя общности будем считать что всегда первый ход делаем белыми
+            //так случай когда первый ход черные переформулируетя из N, M, true в M, N, true
+            road.Add(new BoardNode(initialBoard, TransFormAction.TransFormLeftNearest));
+            Board initialBoardAfterFirstTurn = initialBoard.TransFormLeftNearest();
+
+            Board finalBoard = new(M, N, false);
             List<List<BoardNode>> winnngRoutes = new();
             #endregion
 
             #region CountMinTurns function f(N, M)
             //   We can calculate res directly, but performance is poor
-            int res = CountMinTurns(N, M, ref board, ref finalBoard, ref road, ref winnngRoutes);
+            int res = CountMinTurns(N, M, ref initialBoard, ref initialBoardAfterFirstTurn, ref finalBoard, ref road, ref winnngRoutes);
 
             // easy to notice 
             // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
@@ -127,19 +139,47 @@ namespace Task4Softeq
                 GetTransformsRoad(TransFormedFromRightThroughOne, finalBoard, ref road);
             }
         }
-        private static int CountMinTurns(ushort N, ushort M, ref Board board, ref Board finalBoard,
+        private static int CountMinTurns(ushort N, ushort M, ref Board initialboard, ref Board initialBoardAfterFirstTurn, ref Board finalBoard,
           ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes)
         {
-            road.Clear();
-            GetTransformsRoad(board, finalBoard, ref road);
+            GetTransformsRoad(initialBoardAfterFirstTurn, finalBoard, ref road);
             road.Reverse();
 
             GetWinnngRoutes(ref road, ref winnngRoutes);
-            ClearWinnngRoutes(ref road, ref winnngRoutes);
+            ClearWinnngRoutes(ref winnngRoutes);
+
 
             foreach (List<BoardNode> el in winnngRoutes)
             {
-                if (board.Equals(el.Last().Board))
+                for (int i = 0; i < finalBoard.space; i++)
+                {
+                    Console.Write(finalBoard.fields[i].ToString() + " ");
+                }
+                Console.Write("       ");
+                for (int i = finalBoard.space; i < finalBoard.fields.Length; i++)
+                {
+                    Console.Write(finalBoard.fields[i].ToString() + " ");
+                }
+                Console.WriteLine();
+                foreach (var pos in el)
+                {
+                    for(int i = 0; i < pos.Board.space; i ++)
+                    {
+                        Console.Write(pos.Board.fields[i].ToString() + " ");
+                    }
+                    Console.Write("       ");
+                    for (int i = pos.Board.space; i < pos.Board.fields.Length; i++)
+                    {
+                        Console.Write(pos.Board.fields[i].ToString() + " ");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+
+            foreach (List<BoardNode> el in winnngRoutes)
+            {
+                if (initialboard.Equals(el.Last().Board))
                 {
                     return el.Count;
                 }
@@ -167,7 +207,7 @@ namespace Task4Softeq
                 }
             }
         }
-        private static void ClearWinnngRoutes(ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes)
+        private static void ClearWinnngRoutes(ref List<List<BoardNode>> winnngRoutes)
         {
             for (int count = 0; count < winnngRoutes.Count; count++)
             {
