@@ -4,93 +4,6 @@ using System.Linq;
 
 namespace Task4Softeq
 {
-    class Board
-    {
-        public bool[] Fields;
-        public int Space { get; set; }
-        public static bool CanTransFromLeftNearest(Board Board) => Board.Space != 0 && Board.Fields[Board.Space - 1];
-        public static Board TransFormLeftNearest(Board Board)
-        {
-            Board transformed = new(Board);
-            transformed.Space--;
-
-            return transformed;
-        }
-        public static bool CanTransFromLeftThroughOne(Board Board) => Board.Space > 1 && Board.Fields[Board.Space - 2];
-        public static Board TransFormLeftThroughOne(Board Board)
-        {
-            Board transformed = new(Board);
-            bool temp = transformed.Fields[transformed.Space - 1];
-            transformed.Fields[transformed.Space - 1] = transformed.Fields[transformed.Space - 2];
-            transformed.Fields[transformed.Space - 2] = temp;
-            transformed.Space -= 2;
-
-            return transformed;
-        }
-        public static bool CanTransFromRightNearest(Board Board) => Board.Space < Board.Fields.Length && !Board.Fields[Board.Space];
-        public static Board TransFormRightNearest(Board Board)
-        {
-            Board transformed = new(Board);
-            transformed.Space++;
-
-            return transformed;
-        }
-        public static bool CanTransFromRightThroughOne(Board Board) => Board.Space < Board.Fields.Length - 1 && !Board.Fields[Board.Space + 1];
-        public static Board TransFormRightThroughOne(Board Board)
-        {
-            Board transformed = new(Board);
-            bool temp = transformed.Fields[transformed.Space];
-            transformed.Fields[transformed.Space] = transformed.Fields[transformed.Space + 1];
-            transformed.Fields[transformed.Space + 1] = temp;
-            transformed.Space += 2;
-
-            return transformed;
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() != GetType()) return false;
-
-            Board board = (Board)obj;
-
-            if (Fields.Length != board.Fields.Length)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < Fields.Length; i++)
-            {
-                if (Fields[i] != board.Fields[i])
-                {
-                    return false;
-                }
-            }
-
-            return Space == board.Space;
-        }
-        public Board(int N, int M, bool isWhite)
-        {
-            Space = N;
-            Fields = new bool[N + M];
-            for (int i = 0; i < N; i++)
-            {
-                Fields[i] = isWhite;
-            }
-
-            for (int i = N; i < M + N; i++)
-            {
-                Fields[i] = !isWhite;
-            }
-        }
-        public Board(Board board)
-        {
-            Space = board.Space;
-            Fields = new bool[board.Fields.Length];
-            for (int i = 0; i < board.Fields.Length; i++)
-            {
-                Fields[i] = board.Fields[i];
-            }
-        }
-    }
     class BoardNode
     {
         public Board Board { get; set; }
@@ -114,8 +27,8 @@ namespace Task4Softeq
             ushort N = 8;
             ushort M = 10;
 
-            Board board = new (N, M, true);
-            Board finalBoard = new (M, N, false);
+            Board board = new(N, M, true);
+            Board finalBoard = new(M, N, false);
             List<BoardNode> road = new();
             List<List<BoardNode>> winnngRoutes = new();
             #endregion
@@ -152,40 +65,40 @@ namespace Task4Softeq
             Board TransFormedFromRightNearest = null;
             Board TransFormedFromRightThroughOne = null;
 
-            bool CanTransFromLeftNearest = Board.CanTransFromLeftNearest(board);
+            bool CanTransFromLeftNearest = board.CanTransFromLeftNearest();
             if (CanTransFromLeftNearest)
             {
-                TransFormedFromLeftNearest = Board.TransFormLeftNearest(board);
+                TransFormedFromLeftNearest = board.TransFormLeftNearest();
             }
             if (CanTransFromLeftNearest && TransFormedFromLeftNearest.Equals(finalBoard))
             {
                 road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftNearest));
                 return;
             }
-            bool CanTransFromLeftThroughOne = Board.CanTransFromLeftThroughOne(board);
+            bool CanTransFromLeftThroughOne = board.CanTransFromLeftThroughOne();
             if (CanTransFromLeftThroughOne)
             {
-                TransFormedFromLeftThroughOne = Board.TransFormLeftThroughOne(board);
+                TransFormedFromLeftThroughOne = board.TransFormLeftThroughOne();
             }
             if (CanTransFromLeftThroughOne && TransFormedFromLeftThroughOne.Equals(finalBoard))
             {
                 road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftThroughOne));
                 return;
             }
-            bool CanTransFromRightNearest = Board.CanTransFromRightNearest(board);
+            bool CanTransFromRightNearest = board.CanTransFromRightNearest();
             if (CanTransFromRightNearest)
             {
-                TransFormedFromRightNearest = Board.TransFormRightNearest(board);
+                TransFormedFromRightNearest = board.TransFormRightNearest();
             }
             if (CanTransFromRightNearest && TransFormedFromRightNearest.Equals(finalBoard))
             {
                 road.Add(new BoardNode(board, TransFormAction.CanTransFromRightNearest));
                 return;
             }
-            bool CanTransFromRightThroughOne = Board.CanTransFromRightThroughOne(board);
+            bool CanTransFromRightThroughOne = board.CanTransFromRightThroughOne();
             if (CanTransFromRightThroughOne)
             {
-                TransFormedFromRightThroughOne = Board.TransFormRightThroughOne(board);
+                TransFormedFromRightThroughOne = board.TransFormRightThroughOne();
             }
             if (CanTransFromRightThroughOne && TransFormedFromRightThroughOne.Equals(finalBoard))
             {
@@ -201,7 +114,6 @@ namespace Task4Softeq
             if (CanTransFromLeftThroughOne)
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormLeftThroughOne));
-
                 GetTransformsRoad(TransFormedFromLeftThroughOne, finalBoard, ref road);
             }
             if (CanTransFromRightNearest)
@@ -266,8 +178,8 @@ namespace Task4Softeq
                     {
                         case TransFormAction.TransFormRightThroughOne:
                         case TransFormAction.CanTransFromRightThroughOne:
-                            if ((!Board.CanTransFromRightThroughOne(winnngRoutes[count][i].Board)) ||
-                                (!Board.TransFormRightThroughOne(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board)))
+                            if ((!winnngRoutes[count][i].Board.CanTransFromRightThroughOne()) ||
+                                (!winnngRoutes[count][i].Board.TransFormRightThroughOne().Equals(winnngRoutes[count][i - 1].Board)))
                             {
                                 winnngRoutes[count].RemoveAt(i);
                             }
@@ -278,8 +190,8 @@ namespace Task4Softeq
                             break;
                         case TransFormAction.TransFormRightNearest:
                         case TransFormAction.CanTransFromRightNearest:
-                            if ((!Board.CanTransFromRightNearest(winnngRoutes[count][i].Board)) ||
-                                (!Board.TransFormRightNearest(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board)))
+                            if ((!winnngRoutes[count][i].Board.CanTransFromRightNearest()) ||
+                                (!winnngRoutes[count][i].Board.TransFormRightNearest().Equals(winnngRoutes[count][i - 1].Board)))
                             {
                                 winnngRoutes[count].RemoveAt(i);
                             }
@@ -290,8 +202,8 @@ namespace Task4Softeq
                             break;
                         case TransFormAction.TransFormLeftThroughOne:
                         case TransFormAction.CanTransFromLeftThroughOne:
-                            if ((!Board.CanTransFromLeftThroughOne(winnngRoutes[count][i].Board)) ||
-                                (!Board.TransFormLeftThroughOne(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board)))
+                            if ((!winnngRoutes[count][i].Board.CanTransFromLeftThroughOne()) ||
+                                (!winnngRoutes[count][i].Board.TransFormLeftThroughOne().Equals(winnngRoutes[count][i - 1].Board)))
                             {
                                 winnngRoutes[count].RemoveAt(i);
                             }
@@ -302,8 +214,8 @@ namespace Task4Softeq
                             break;
                         case TransFormAction.TransFormLeftNearest:
                         case TransFormAction.CanTransFromLeftNearest:
-                            if ((!Board.CanTransFromLeftNearest(winnngRoutes[count][i].Board)) ||
-                                (!Board.TransFormLeftNearest(winnngRoutes[count][i].Board).Equals(winnngRoutes[count][i - 1].Board)))
+                            if ((!winnngRoutes[count][i].Board.CanTransFromLeftNearest()) ||
+                                (!winnngRoutes[count][i].Board.TransFormLeftNearest().Equals(winnngRoutes[count][i - 1].Board)))
                             {
                                 winnngRoutes[count].RemoveAt(i);
                             }
