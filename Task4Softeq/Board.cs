@@ -68,6 +68,29 @@ namespace Task4Softeq
             return transformed;
         }
 
+        internal bool CanMoveRightItemsThroughLeftSpace()
+        {
+            for (int i = space; i < fields.Length - 2; i++)
+            {
+                if (fields[i] && fields[i + 1] && !fields[i + 2])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        internal bool CanMoveLeftItemsThroughRightSpace()
+        {
+            for (int i = space; i >= 3; i--)
+            {
+                if (!fields[i - 1] && !fields[i - 2] && fields[i - 3])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public override bool Equals(object obj)
         {
 //            if (obj.GetType() != GetType()) return false;

@@ -4,28 +4,14 @@ using System.Linq;
 
 namespace Task4Softeq
 {
-    class BoardNode
-    {
-        public Board Board { get; set; }
-        public TransFormAction TransformAction { get; set; }
-        public BoardNode(Board board, TransFormAction transformAction)
-        {
-            Board = board;
-            TransformAction = transformAction;
-        }
-        public bool CanTransform() => TransformAction == TransFormAction.CanTransFromRightNearest ||
-            TransformAction == TransFormAction.CanTransFromLeftNearest ||
-            TransformAction == TransFormAction.CanTransFromLeftThroughOne ||
-            TransformAction == TransFormAction.CanTransFromRightThroughOne;
-    }
     class Program
     {
         static void Main(string[] args)
         {
             #region input and define
 
-            ushort N = 1;
-            ushort M = 1;
+            ushort N = 55;
+            ushort M = 55;
 
             List<BoardNode> road = new();
 
@@ -53,16 +39,18 @@ namespace Task4Softeq
             // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
             // f(N + 1, M) = f(N, M) + M + 1            (II)  mathematical induction
 
-            //res = CountMinTurns(1, 1, ref board, ref finalBoard, ref road, ref winnngRoutes);
-
-            //while (M > 1) {
-            //  res += N + 1;
-            //  M--;
+            // res = CountMinTurns(1, 1, ref initialBoard, ref initialBoardAfterFirstTurn, ref finalBoard, ref road, ref winnngRoutes);
+            //int res = 3;
+            //while (M > 1)
+            //{
+            //    res += N + 1;
+            //    M--;
             //}
 
-            //while (N > 1) {
-            //  res += M + 1;
-            //  N--;
+            //while (N > 1)
+            //{
+            //    res += M + 1;
+            //    N--;
             //}
             #endregion
 
@@ -118,22 +106,30 @@ namespace Task4Softeq
                 return;
             }
 
-            if (CanTransFromLeftNearest)
+            if (CanTransFromLeftNearest &&
+                TransFormedFromLeftNearest.CanMoveLeftItemsThroughRightSpace() &&
+                TransFormedFromLeftNearest.CanMoveRightItemsThroughLeftSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormLeftNearest));
                 GetTransformsRoad(TransFormedFromLeftNearest, finalBoard, ref road);
             }
-            if (CanTransFromLeftThroughOne)
+            if (CanTransFromLeftThroughOne &&
+                TransFormedFromLeftThroughOne.CanMoveLeftItemsThroughRightSpace() &&
+                TransFormedFromLeftThroughOne.CanMoveRightItemsThroughLeftSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormLeftThroughOne));
                 GetTransformsRoad(TransFormedFromLeftThroughOne, finalBoard, ref road);
             }
-            if (CanTransFromRightNearest)
+            if (CanTransFromRightNearest &&
+                TransFormedFromRightNearest.CanMoveLeftItemsThroughRightSpace() &&
+                TransFormedFromRightNearest.CanMoveRightItemsThroughLeftSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormRightNearest));
                 GetTransformsRoad(TransFormedFromRightNearest, finalBoard, ref road);
             }
-            if (CanTransFromRightThroughOne)
+            if (CanTransFromRightThroughOne &&
+                TransFormedFromRightThroughOne.CanMoveLeftItemsThroughRightSpace() &&
+                TransFormedFromRightThroughOne.CanMoveRightItemsThroughLeftSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormRightThroughOne));
                 GetTransformsRoad(TransFormedFromRightThroughOne, finalBoard, ref road);
@@ -148,7 +144,7 @@ namespace Task4Softeq
             GetWinnngRoutes(ref road, ref winnngRoutes);
             ClearWinnngRoutes(ref winnngRoutes);
 
-
+            /*
             foreach (List<BoardNode> el in winnngRoutes)
             {
                 for (int i = 0; i < finalBoard.space; i++)
@@ -175,7 +171,7 @@ namespace Task4Softeq
                     Console.WriteLine();
                 }
             }
-
+            */
 
             foreach (List<BoardNode> el in winnngRoutes)
             {
@@ -193,13 +189,13 @@ namespace Task4Softeq
 
             for (int i = 0; i < road.Count; i++)
             {
-                if (road[i].CanTransform())
+                if (road[i].CanTransformToFinal())
                 {
                     winnngRoutes.Add(new List<BoardNode>());
                     int j = i;
                     winnngRoutes.Last().Add(road[j]);
                     j++;
-                    while ((j < road.Count) && (!road[j].CanTransform()))
+                    while ((j < road.Count) && (!road[j].CanTransformToFinal()))
                     {
                         winnngRoutes.Last().Add(road[j]);
                         j++;
