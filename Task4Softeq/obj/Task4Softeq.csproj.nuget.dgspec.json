@@ -1,28 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Desctop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj": {}
+    "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj": {}
   },
   "projects": {
-    "D:\\Desctop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj": {
+    "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Desctop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
+        "projectUniqueName": "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
         "projectName": "Task4Softeq",
-        "projectPath": "D:\\Desctop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
-        "packagesPath": "C:\\Users\\dgutcko\\.nuget\\packages\\",
-        "outputPath": "D:\\Desctop\\Task4Softeq\\Task4Softeq\\obj\\",
+        "projectPath": "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\Task4Softeq.csproj",
+        "packagesPath": "C:\\Users\\Furer\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Furer\\Desktop\\Task4Softeq\\Task4Softeq\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dgutcko\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 18.1.config",
+          "C:\\Users\\Furer\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\DevExpress 18.1\\Components\\System\\Components\\Packages": {},
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
@@ -53,8 +51,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -63,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -10,8 +10,8 @@ namespace Task4Softeq
         {
             #region input and define
 
-            ushort N = 55;
-            ushort M = 55;
+            ushort N = 10;
+            ushort M = 15;
 
             List<BoardNode> road = new();
 
@@ -31,28 +31,7 @@ namespace Task4Softeq
             List<List<BoardNode>> winnngRoutes = new();
             #endregion
 
-            #region CountMinTurns function f(N, M)
-            //   We can calculate res directly, but performance is poor
             int res = CountMinTurns(N, M, ref initialBoard, ref initialBoardAfterFirstTurn, ref finalBoard, ref road, ref winnngRoutes);
-
-            // easy to notice 
-            // f(N, M) = f(M, N)                        (I)   symmetrical definition - function is even
-            // f(N + 1, M) = f(N, M) + M + 1            (II)  mathematical induction
-
-            // res = CountMinTurns(1, 1, ref initialBoard, ref initialBoardAfterFirstTurn, ref finalBoard, ref road, ref winnngRoutes);
-            //int res = 3;
-            //while (M > 1)
-            //{
-            //    res += N + 1;
-            //    M--;
-            //}
-
-            //while (N > 1)
-            //{
-            //    res += M + 1;
-            //    N--;
-            //}
-            #endregion
 
             Console.WriteLine(res);
             return;
@@ -60,81 +39,62 @@ namespace Task4Softeq
 
         private static void GetTransformsRoad(Board board, Board finalBoard, ref List<BoardNode> road)
         {
-            Board TransFormedFromLeftNearest = null;
-            Board TransFormedFromLeftThroughOne = null;
-            Board TransFormedFromRightNearest = null;
-            Board TransFormedFromRightThroughOne = null;
+            Board transFormedFromLeftNearest = null;
+            Board transFormedFromRightNearest = null;
 
-            bool CanTransFromLeftNearest = board.CanTransFromLeftNearest();
-            if (CanTransFromLeftNearest)
+            #region check for return from recursion
+            bool canTransFromLeftNearest = board.CanTransFromLeftNearest();
+            if (canTransFromLeftNearest)
             {
-                TransFormedFromLeftNearest = board.TransFormLeftNearest();
+                transFormedFromLeftNearest = board.TransFormLeftNearest();
             }
-            if (CanTransFromLeftNearest && TransFormedFromLeftNearest.Equals(finalBoard))
+            if (canTransFromLeftNearest && transFormedFromLeftNearest.Equals(finalBoard))
             {
                 road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftNearest));
                 return;
             }
-            bool CanTransFromLeftThroughOne = board.CanTransFromLeftThroughOne();
-            if (CanTransFromLeftThroughOne)
+            bool canTransFromRightNearest = board.CanTransFromRightNearest();
+            if (canTransFromRightNearest)
             {
-                TransFormedFromLeftThroughOne = board.TransFormLeftThroughOne();
+                transFormedFromRightNearest = board.TransFormRightNearest();
             }
-            if (CanTransFromLeftThroughOne && TransFormedFromLeftThroughOne.Equals(finalBoard))
-            {
-                road.Add(new BoardNode(board, TransFormAction.CanTransFromLeftThroughOne));
-                return;
-            }
-            bool CanTransFromRightNearest = board.CanTransFromRightNearest();
-            if (CanTransFromRightNearest)
-            {
-                TransFormedFromRightNearest = board.TransFormRightNearest();
-            }
-            if (CanTransFromRightNearest && TransFormedFromRightNearest.Equals(finalBoard))
+            if (canTransFromRightNearest && transFormedFromRightNearest.Equals(finalBoard))
             {
                 road.Add(new BoardNode(board, TransFormAction.CanTransFromRightNearest));
                 return;
             }
-            bool CanTransFromRightThroughOne = board.CanTransFromRightThroughOne();
-            if (CanTransFromRightThroughOne)
-            {
-                TransFormedFromRightThroughOne = board.TransFormRightThroughOne();
-            }
-            if (CanTransFromRightThroughOne && TransFormedFromRightThroughOne.Equals(finalBoard))
-            {
-                road.Add(new BoardNode(board, TransFormAction.CanTransFromRightThroughOne));
-                return;
-            }
+            #endregion
 
-            if (CanTransFromLeftNearest &&
-                TransFormedFromLeftNearest.CanMoveLeftItemsThroughRightSpace() &&
-                TransFormedFromLeftNearest.CanMoveRightItemsThroughLeftSpace())
+            if (canTransFromLeftNearest && transFormedFromLeftNearest.CanMoveItemsThroughSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormLeftNearest));
-                GetTransformsRoad(TransFormedFromLeftNearest, finalBoard, ref road);
+                GetTransformsRoad(transFormedFromLeftNearest, finalBoard, ref road);
             }
-            if (CanTransFromLeftThroughOne &&
-                TransFormedFromLeftThroughOne.CanMoveLeftItemsThroughRightSpace() &&
-                TransFormedFromLeftThroughOne.CanMoveRightItemsThroughLeftSpace())
-            {
-                road.Add(new BoardNode(board, TransFormAction.TransFormLeftThroughOne));
-                GetTransformsRoad(TransFormedFromLeftThroughOne, finalBoard, ref road);
-            }
-            if (CanTransFromRightNearest &&
-                TransFormedFromRightNearest.CanMoveLeftItemsThroughRightSpace() &&
-                TransFormedFromRightNearest.CanMoveRightItemsThroughLeftSpace())
+            if (canTransFromRightNearest && transFormedFromRightNearest.CanMoveItemsThroughSpace())
             {
                 road.Add(new BoardNode(board, TransFormAction.TransFormRightNearest));
-                GetTransformsRoad(TransFormedFromRightNearest, finalBoard, ref road);
+                GetTransformsRoad(transFormedFromRightNearest, finalBoard, ref road);
             }
-            if (CanTransFromRightThroughOne &&
-                TransFormedFromRightThroughOne.CanMoveLeftItemsThroughRightSpace() &&
-                TransFormedFromRightThroughOne.CanMoveRightItemsThroughLeftSpace())
+            if (board.CanTransFromLeftThroughOne())
             {
-                road.Add(new BoardNode(board, TransFormAction.TransFormRightThroughOne));
-                GetTransformsRoad(TransFormedFromRightThroughOne, finalBoard, ref road);
+                Board TransFormedFromLeftThroughOne = board.TransFormLeftThroughOne();
+                if (TransFormedFromLeftThroughOne.CanMoveItemsThroughSpace())
+                {
+                    road.Add(new BoardNode(board, TransFormAction.TransFormLeftThroughOne));
+                    GetTransformsRoad(TransFormedFromLeftThroughOne, finalBoard, ref road);
+                }
+            }
+            if (board.CanTransFromRightThroughOne())
+            {
+                Board TransFormedFromRightThroughOne = board.TransFormRightThroughOne();
+                if (TransFormedFromRightThroughOne.CanMoveItemsThroughSpace())
+                {
+                    road.Add(new BoardNode(board, TransFormAction.TransFormRightThroughOne));
+                    GetTransformsRoad(TransFormedFromRightThroughOne, finalBoard, ref road);
+                }
             }
         }
+
         private static int CountMinTurns(ushort N, ushort M, ref Board initialboard, ref Board initialBoardAfterFirstTurn, ref Board finalBoard,
           ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes)
         {
@@ -143,8 +103,7 @@ namespace Task4Softeq
 
             GetWinnngRoutes(ref road, ref winnngRoutes);
             ClearWinnngRoutes(ref winnngRoutes);
-
-            /*
+            
             foreach (List<BoardNode> el in winnngRoutes)
             {
                 for (int i = 0; i < finalBoard.space; i++)
@@ -170,8 +129,7 @@ namespace Task4Softeq
                     }
                     Console.WriteLine();
                 }
-            }
-            */
+            }            
 
             foreach (List<BoardNode> el in winnngRoutes)
             {
@@ -183,26 +141,27 @@ namespace Task4Softeq
 
             return 0;
         }
+
         private static void GetWinnngRoutes(ref List<BoardNode> road, ref List<List<BoardNode>> winnngRoutes)
         {
-            winnngRoutes.Clear();
-
-            for (int i = 0; i < road.Count; i++)
+            int i = 0;
+            while (i < road.Count)
             {
                 if (road[i].CanTransformToFinal())
                 {
-                    winnngRoutes.Add(new List<BoardNode>());
-                    int j = i;
-                    winnngRoutes.Last().Add(road[j]);
-                    j++;
-                    while ((j < road.Count) && (!road[j].CanTransformToFinal()))
+                    var newWinnngRoute = new List<BoardNode>();
+                    do
                     {
-                        winnngRoutes.Last().Add(road[j]);
-                        j++;
+                          newWinnngRoute.Add(road[i]);
+                          i++;
                     }
+                    while ((i < road.Count) && (!road[i].CanTransformToFinal()));
+                    winnngRoutes.Add(newWinnngRoute);
                 }
-            }
+                i++;
+            } 
         }
+
         private static void ClearWinnngRoutes(ref List<List<BoardNode>> winnngRoutes)
         {
             for (int count = 0; count < winnngRoutes.Count; count++)
@@ -213,7 +172,6 @@ namespace Task4Softeq
                     switch (winnngRoutes[count][i].TransformAction)
                     {
                         case TransFormAction.TransFormRightThroughOne:
-                        case TransFormAction.CanTransFromRightThroughOne:
                             if ((!winnngRoutes[count][i].Board.CanTransFromRightThroughOne()) ||
                                 (!winnngRoutes[count][i].Board.TransFormRightThroughOne().Equals(winnngRoutes[count][i - 1].Board)))
                             {
@@ -237,7 +195,6 @@ namespace Task4Softeq
                             }
                             break;
                         case TransFormAction.TransFormLeftThroughOne:
-                        case TransFormAction.CanTransFromLeftThroughOne:
                             if ((!winnngRoutes[count][i].Board.CanTransFromLeftThroughOne()) ||
                                 (!winnngRoutes[count][i].Board.TransFormLeftThroughOne().Equals(winnngRoutes[count][i - 1].Board)))
                             {

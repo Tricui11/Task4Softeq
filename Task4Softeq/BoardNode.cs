@@ -11,9 +11,11 @@
             TransformAction = transformAction;
         }
 
-        public bool CanTransformToFinal() => TransformAction == TransFormAction.CanTransFromRightNearest ||
-            TransformAction == TransFormAction.CanTransFromLeftNearest ||
-            TransformAction == TransFormAction.CanTransFromLeftThroughOne ||
-            TransformAction == TransFormAction.CanTransFromRightThroughOne;
-    }
+    public bool CanTransformToFinal() => TransformAction == TransFormAction.CanTransFromRightNearest ||
+        TransformAction == TransFormAction.CanTransFromLeftNearest;
+    // || следуя той же логике что и в методах CanMoveRightItemsThroughLeftSpace CanMoveLeftItemsThroughRightSpace
+    // можно отсечь трансформацию в финальную доску в ход через одну фигуру
+    //        TransformAction == TransFormAction.CanTransFromLeftThroughOne || 
+    //        TransformAction == TransFormAction.CanTransFromRightThroughOne;
+  }
 }

@@ -68,7 +68,10 @@ namespace Task4Softeq
             return transformed;
         }
 
-        internal bool CanMoveRightItemsThroughLeftSpace()
+        //Так как фигуры в рамках цвета двигаются только в одну сторону
+        //то можно ввести  две функции на проверку возможности перемещения фигур через пробел
+        //тем самым отсекая множество досок, которые не имеют решения 
+        internal bool CanMoveRightItemsThroughLeftSpace()  
         {
             for (int i = space; i < fields.Length - 2; i++)
             {
@@ -91,7 +94,9 @@ namespace Task4Softeq
             return true;
         }
 
-        public override bool Equals(object obj)
+    internal bool CanMoveItemsThroughSpace() => CanMoveRightItemsThroughLeftSpace() && CanMoveLeftItemsThroughRightSpace();
+
+    public override bool Equals(object obj)
         {
 //            if (obj.GetType() != GetType()) return false;
 

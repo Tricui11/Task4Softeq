@@ -1,9 +1,9 @@
 ﻿namespace Task4Softeq {
   enum TransFormAction {
     CanTransFromLeftNearest,
-    CanTransFromLeftThroughOne,
+ //   CanTransFromLeftThroughOne,
     CanTransFromRightNearest,
-    CanTransFromRightThroughOne,
+ //   CanTransFromRightThroughOne,
     TransFormLeftNearest,
     TransFormLeftThroughOne,
     TransFormRightNearest,
